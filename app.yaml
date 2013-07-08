@@ -5,5 +5,12 @@ api_version: 1
 threadsafe: false
 
 handlers:
-- url: .*
-  script: main.php
+
+- url: /contacts
+  script: contacts_example.php
+
+- url: /oauth2callback
+  script: contacts_example.php
+
+#- url: .*
+#  script: main.php

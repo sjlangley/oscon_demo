@@ -1205,15 +1205,15 @@ class Twig_Environment
             if (false === @mkdir($dir, 0777, true) && !is_dir($dir)) {
                 throw new RuntimeException(sprintf("Unable to create the cache directory (%s).", $dir));
             }
-        } elseif (!is_writable($dir)) {
+        } elseif (false) {  // !is_writable($dir)) {
             throw new RuntimeException(sprintf("Unable to write in the cache directory (%s).", $dir));
         }
 
-        $tmpFile = tempnam(dirname($file), basename($file));
-        if (false !== @file_put_contents($tmpFile, $content)) {
+        $tmpFile = dirname($file) . '/' . basename($file) . $_SERVER["REQUEST_ID_HASH"];
+        if (false !== file_put_contents($tmpFile, $content)) {
             // rename does not work on Win32 before 5.2.6
-            if (@rename($tmpFile, $file) || (@copy($tmpFile, $file) && unlink($tmpFile))) {
-                @chmod($file, 0666 & ~umask());
+            if (rename($tmpFile, $file) || (copy($tmpFile, $file) && unlink($tmpFile))) {
+                chmod($file, 0666 & ~umask());
 
                 return;
             }
