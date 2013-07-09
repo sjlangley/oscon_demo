@@ -1,39 +1,40 @@
 <?php
 
-require_once 'google_api_php_client/src/Google_Client.php';
-require_once 'google_api_php_client/src/contrib/Google_DatastoreService.php';
+require_once 'config.php';
+require_once 'Datastore/Datastore.php';
 
-// Set your client id, service account name, and the path to your private key.
-// For more information about obtaining these keys, visit:
-// https://developers.google.com/console/help/#service_accounts
-const CLIENT_ID = 'INSERT_YOUR_CLIENT_ID';
-const SERVICE_ACCOUNT_NAME = 'INSERT_YOUR_SERVICE_ACCOUNT_NAME';
+$dataset = Datastore::getDataset($google_api_config);
 
-// Make sure you keep your key.p12 file in a secure location, and isn't
-// readable by others.
-const KEY_FILE = '/super/secret/path/to/key.p12';
+$request = new Google_BlindWriteRequest();
+$path = new Google_KeyPathElement();
+$path->setKind('User');
 
-$client = new Google_Client();
-$client->setApplicationName('OSCON App Engine Demo');
+$propertyMap = [];
 
-session_start();
+$textProperty = new Google_Property();
+$value = new Google_Value();
+$value->setStringValue('foo');
+$textProperty->setValues([$value]);
+$propertyMap['text'] = $textProperty;
 
-if (isset($_SESSION['token'])) {
-    $client->setAccessToken($_SESSION['token']);
-}
+$key = new Google_Key();
+$key->setPath([$path]);
 
-// Load the key in PKCS 12 format (you need to download this from the
-// Google API Console when the service account was created.
-$key = file_get_contents(KEY_FILE);
-$client->setAssertionCredentials(new Google_AssertionCredentials(
-        SERVICE_ACCOUNT_NAME,
-        array('https://www.googleapis.com/auth/prediction'),
-        $key)
-);
+$entity = new Google_Entity();
+$entity->setKey($key);
+$entity->setProperties($propertyMap);
 
-$client->setClientId(CLIENT_ID);
-$datastore = new Google_DatastoreService($client);
+$mutation = new Google_Mutation();
+$mutation->setInsertAutoId([$entity]);
+$request->setMutation($mutation);
 
-$req = new Google_BlindWriteRequest();
-$entity = $req->getMutation()->getUpsert()-
+
+$resp = $dataset->blindWrite(Datastore::DATASET_ID, $request);
+
+var_dump($resp);
+//$request = new Google_LookupRequest();
+//$request->setKeys([]);
+//$response = $dataset->lookup(Datastore::DATASET_ID, $request);
+
+
 

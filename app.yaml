@@ -6,11 +6,26 @@ threadsafe: false
 
 handlers:
 
+- url: /css
+  static_dir: bootstrap/css
+
+- url: /js
+  static_dir: bootstrap/js
+
+- url: /img
+  static_dir: bootstrap/img
+
 - url: /contacts
   script: contacts_example.php
 
 - url: /oauth2callback
   script: contacts_example.php
 
-#- url: .*
-#  script: main.php
+- url: /datastore
+  script: datastore_test.php
+
+- url: /prediction
+  script: prediction.php
+
+- url: /main
+  script: main.php
